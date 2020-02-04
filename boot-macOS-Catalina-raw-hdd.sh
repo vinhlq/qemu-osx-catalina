@@ -15,11 +15,6 @@ MY_OPTIONS="+pcid,+ssse3,+sse4.2,+popcnt,+avx,+aes,+xsave,+xsaveopt,check"
 # OVMF=./firmware
 OVMF="./"
 
-ip link del tap0
-ip tuntap add dev tap0 mode tap
-ip link set tap0 up promisc on
-ip addr add 192.168.88.1/24 dev tap0
-
 qemu-system-x86_64 -enable-kvm -m 3072 -cpu Penryn,kvm=on,vendor=GenuineIntel,+invtsc,vmware-cpuid-freq=on,$MY_OPTIONS\
 	  -machine q35 \
 	  -smp 4,cores=2 \
@@ -36,11 +31,12 @@ qemu-system-x86_64 -enable-kvm -m 3072 -cpu Penryn,kvm=on,vendor=GenuineIntel,+i
 	  -drive id=InstallMedia,if=none,file=BaseSystem_Catalina.img,format=raw \
 	  -drive id=MacHDD,if=none,file=./mac_hdd_ng.img,format=raw \
 	  -device ide-hd,bus=sata.4,drive=MacHDD \
-	  -netdev tap,id=net0,ifname=tap0,script=no,downscript=no -device vmxnet3,netdev=net0,id=net0,mac=52:54:00:c9:18:27 \
-	  -netdev type=tap,id=net1,ifname=tap1,script=tap_ifup,downscript=tap_ifdown,vhost=on \
-      -device virtio-net-pci,netdev=net1,addr=19.0,mac=52:54:BE:EF:12:66    \
+	  \
+	  -netdev tap,id=net0,ifname=tap0,script=tap0_ifup,downscript=tap0_ifdown,vhost=on \
+	  -device vmxnet3,netdev=net0,addr=19.0,mac=52:54:BE:EF:12:66    \
+	  \
+	  -netdev tap,id=net1,ifname=tap1,script=tap1_ifup,downscript=tap1_ifdown  \
+	  -device vmxnet3,netdev=net1,mac=52:54:00:c9:18:27 \
+	  \
 	  -monitor stdio \
 	  -vga vmware
-
-ip link del tap0
-ip link del tap1
