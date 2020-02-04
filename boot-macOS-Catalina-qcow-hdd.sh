@@ -15,11 +15,10 @@ MY_OPTIONS="+pcid,+ssse3,+sse4.2,+popcnt,+avx,+aes,+xsave,+xsaveopt,check"
 # OVMF=./firmware
 OVMF="./"
 
-# ip link del tap0
-# ip tuntap add dev tap0 mode tap
-# ip link set tap0 up promisc on
-# ip link set dev wlp3s0 up
-# ip link set dev tap0 master wlp3s0
+ip link del tap0
+ip tuntap add dev tap0 mode tap
+ip link set tap0 up promisc on
+ip addr add 192.168.88.1/24 dev tap1
 
 qemu-system-x86_64 -enable-kvm -m 3072 -cpu Penryn,kvm=on,vendor=GenuineIntel,+invtsc,vmware-cpuid-freq=on,$MY_OPTIONS\
 	  -machine q35 \
@@ -27,11 +26,11 @@ qemu-system-x86_64 -enable-kvm -m 3072 -cpu Penryn,kvm=on,vendor=GenuineIntel,+i
 	  -usb -device usb-kbd -device usb-mouse \
 	  -device isa-applesmc,osk="ourhardworkbythesewordsguardedpleasedontsteal(c)AppleComputerInc" \
 	  -drive if=pflash,format=raw,readonly,file=$OVMF/OVMF_CODE.fd \
-	  -drive if=pflash,format=raw,file=$OVMF/OVMF_VARS-1024x768.fd \
+	  -drive if=pflash,format=raw,file=$OVMF/OVMF_VARS-1920x1080.fd \
 	  -smbios type=2 \
 	  -device ich9-intel-hda -device hda-duplex \
 	  -device ich9-ahci,id=sata \
-	  -drive id=Clover,if=none,snapshot=on,format=qcow2,file=./'Catalina/CloverNG.qcow2' \
+	  -drive id=Clover,if=none,snapshot=on,format=qcow2,file=./'Catalina/CloverNG-1920x1080.qcow2' \
 	  -device ide-hd,bus=sata.2,drive=Clover \
 	  -device ide-hd,bus=sata.3,drive=InstallMedia \
 	  -drive id=InstallMedia,if=none,file=BaseSystem_Catalina.img,format=raw \
@@ -43,4 +42,5 @@ qemu-system-x86_64 -enable-kvm -m 3072 -cpu Penryn,kvm=on,vendor=GenuineIntel,+i
 	  -monitor stdio \
 	  -vga vmware
 
+ip link del tap0
 ip link del tap1
