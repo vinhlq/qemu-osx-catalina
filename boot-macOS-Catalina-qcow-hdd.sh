@@ -18,7 +18,7 @@ OVMF="./"
 ip link del tap0
 ip tuntap add dev tap0 mode tap
 ip link set tap0 up promisc on
-ip addr add 192.168.88.1/24 dev tap1
+ip addr add 192.168.88.1/24 dev tap0
 
 qemu-system-x86_64 -enable-kvm -m 3072 -cpu Penryn,kvm=on,vendor=GenuineIntel,+invtsc,vmware-cpuid-freq=on,$MY_OPTIONS\
 	  -machine q35 \
